@@ -1,9 +1,25 @@
-
+## Spring Boot Application
 
 ```shell
-mvn clean & mvn build
+mvn -f app clean & mvn -f app build
 ```
 
 ```shell
-mvn spring-boot:run
+mvn -f app spring-boot:run
+```
+
+```shell
+terraform -chdir=infra fmt
+```
+
+```shell
+terraform -chdir=infra plan
+```
+
+```shell
+terraform -chdir=infra apply
+```
+
+```shell
+terraform -chdir=infra destroy
 ```
