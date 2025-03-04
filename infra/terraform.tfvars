@@ -2,4 +2,4 @@ region          = "us-east-1"
 ami             = "ami-02a53b0d62d37a757"
 instance_type   = "t2.micro"
 key_name        = "terraform-keypair"
-public_key_path = "~/.ssh/id_ed25519.pub"
+destroy_infra   = false
