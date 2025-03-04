@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "aws" {
-  region = "us-east-1"
+  region = var.region
 }
 
 resource "aws_security_group" "backend" {
@@ -38,18 +38,14 @@ resource "aws_security_group" "backend" {
 }
 
 resource "aws_key_pair" "keypair" {
-  key_name   = "terraform-keypair"
-  public_key = file("~/.ssh/id_ed25519.pub")
+  key_name   = var.key_name
+  public_key = file(var.public_key_path)
 }
 
 resource "aws_instance" "ec2" {
-  ami                    = "ami-02a53b0d62d37a757"
-  instance_type          = "t2.micro"
-  user_data              = file("user_data.sh")
+  ami                    = var.ami
+  instance_type          = var.instance_type
   key_name               = aws_key_pair.keypair.key_name
   vpc_security_group_ids = [aws_security_group.backend.id]
-}
-
-output "public_ip" {
-  value = aws_instance.ec2.public_ip
+  user_data              = file("user_data.sh")
 }
