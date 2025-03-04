@@ -29,7 +29,6 @@ jobs:
           touch ~/.ssh/id_rsa_ec2
           echo "${{ secrets.AWS_PRIVATE_KEY }}" > ~/.ssh/id_rsa_ec2
           chmod 600 ~/.ssh/id_rsa_ec2
-          cat ~/.ssh/id_rsa_ec2
 
       - name: Get Description from pull request
         run: |
