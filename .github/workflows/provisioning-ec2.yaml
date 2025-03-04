@@ -39,8 +39,8 @@ jobs:
       - name: Get Destroy infra from tfvars
         run: |
           export DESTROY_INFRA=$(cat infra/terraform.tfvars | grep destroy_infra | cut -d'=' -f2 | tr -d '[:space:]')
-          echo "Destroy Infra: DESTROY_INFRA"
-          echo "DESTROY_INFRA=DESTROY_INFRA" >> $GITHUB_ENV
+          echo "Destroy Infra: $DESTROY_INFRA"
+          echo "DESTROY_INFRA=$DESTROY_INFRA" >> $GITHUB_ENV
 
       - name: Destroy infra if variable is set
         if: ${{ env.DESTROY_INFRA == 'true' }}
