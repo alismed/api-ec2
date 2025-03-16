@@ -1,53 +1,97 @@
-## Spring Boot Application
-This project is a simple example of how to create a Spring Boot api and deploy it using Terraform.
+# Spring Boot API with AWS EC2 Deployment
+This project demonstrates how to create a Spring Boot API and deploy it to AWS EC2 using Terraform for infrastructure provisioning and GitHub Actions.
 
-### Requirements
-- AWS Cli
-- Terraform Cli
+## Project Overview
+The application consists of:
+- Spring Boot REST API
+- AWS EC2 instance for hosting
+- Terraform scripts for infrastructure management
+- CI/CD pipeline using GitHub Actions
+
+## Requirements
+
+### Local Development
 - Java 17
 - Maven
-- Docker*
-- Localstack Cli*
-- S3 Bucket pre-built in AWS**
+- AWS CLI
+- Terraform CLI
+- Docker (recommended)
+- Localstack CLI (recommended)
 
-*Not essential, but recommended.
-**Is also possible to create a new bucket in this terraform script.
+### AWS Resources
+- AWS Account with appropriate permissions
+- S3 Bucket for Terraform state (can be created via terraform)
 
-### Localstack
-To use LocalStack on your local machine, add a profile in the aws cli settings: `.aws/credentials` and `.aws/config`
+## Setup Instructions
 
-### Terraform State
-The S3 bucket pre-built is used to store the terraform state file. The bucket name is defined in the `backend.tf` file.
+### AWS Configuration
+1. Configure AWS CLI credentials:
+   ```shell
+   aws configure
+   ```
+2. For LocalStack testing, add profiles in:
+   - `.aws/credentials`
+   - `.aws/config`
 
-### Github Actions
-The Github Actions is used to run the terraform script and deploy the Glue Job in the AWS environment.
-The script only will run if the branch starts with `feature/`.
-
-### Commands
+### Application Build & Run
 ```shell
-mvn -f app clean & mvn -f app build
-```
+# Build the application
+mvn -f app clean install
 
-```shell
+# Run locally
 mvn -f app spring-boot:run
+
+# Run tests
+mvn -f app test
 ```
 
+### Infrastructure Management
 ```shell
+# Initialize Terraform
 terraform -chdir=infra init
-```
 
-```shell
+# Format Terraform files
 terraform -chdir=infra fmt
-```
 
-```shell
+# Plan changes
 terraform -chdir=infra plan
-```
 
-```shell
+# Apply changes
 terraform -chdir=infra apply -auto-approve
-```
 
-```shell
+# Destroy infrastructure
 terraform -chdir=infra destroy -auto-approve
 ```
+
+## Project Structure
+```
+api-ec2/
+├── app/               # Spring Boot application
+├── infra/             # Terraform infrastructure code
+└── .github/workflows/ # GitHub Actions CI/CD
+```
+
+## Infrastructure Details
+- The Terraform state is stored in an S3 bucket (configured in `backend.tf`)
+- EC2 instance hosts the Spring Boot application
+- Security groups and networking are managed via Terraform
+
+## CI/CD Pipeline
+- GitHub Actions workflow triggers on branches prefixed with `feature/`
+- Set the AWS credentials on the secrets of the project
+- Pipeline steps:
+  1. Build and test application
+  2. Run Terraform validation
+  3. Deploy infrastructure
+  4. Deploy application
+
+## Contributing
+1. Create a new feature branch (`feature/your-feature`)
+2. Commit your changes
+3. Push to the branch
+4. Create a Pull Request
+
+## Troubleshooting
+- Ensure AWS credentials are properly configured
+- Check EC2 instance logs in CloudWatch
+- Verify security group settings if API is unreachable
