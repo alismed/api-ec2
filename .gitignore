@@ -9,11 +9,11 @@ buildNumber.properties
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
 
-#eclipse
 .classpath
 .project
 .settings
 .idea
+.vscode
 
 # Local .terraform directories
 **/.terraform/*

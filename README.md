@@ -34,6 +34,13 @@ The application consists of:
    - `.aws/config`
 
 ### Application Build & Run
+
+*Dockerfile*
+- Uses Maven in the first stage to build the application
+- Uses an Alpine image with JRE in the final stage, which is much smaller than the full JDK image
+- Copies only the necessary JAR from the build stage
+
+*Development tools*
 ```shell
 # Build the application
 mvn -f app clean install
@@ -43,6 +50,17 @@ mvn -f app spring-boot:run
 
 # Run tests
 mvn -f app test
+```
+
+*Build the docker image*
+```shell
+- cd app
+
+docker build -t alismed/api-ec2:latest .
+
+docker login
+
+docker push alismed/api-ec2:latest
 ```
 
 ### Infrastructure Management
