@@ -10,17 +10,16 @@ The application consists of:
 
 ## Requirements
 
+### AWS Resources
+- AWS Account with appropriate permissions
+- S3 Bucket for Terraform state (can be created via terraform)
+
 ### Local Development
 - Java 17
 - Maven
 - AWS CLI
 - Terraform CLI
 - Docker (recommended)
-- Localstack CLI (recommended)
-
-### AWS Resources
-- AWS Account with appropriate permissions
-- S3 Bucket for Terraform state (can be created via terraform)
 
 ## Setup Instructions
 
@@ -54,7 +53,7 @@ mvn -f app test
 
 *Build the docker image*
 ```shell
-- cd app
+cd app
 
 docker build -t alismed/api-ec2:latest .
 
@@ -63,7 +62,7 @@ docker login
 docker push alismed/api-ec2:latest
 ```
 
-### Infrastructure Management
+### Infrastructure Management locally
 ```shell
 # Initialize Terraform
 terraform -chdir=infra init
@@ -80,6 +79,51 @@ terraform -chdir=infra apply -auto-approve
 # Destroy infrastructure
 terraform -chdir=infra destroy -auto-approve
 ```
+
+## Testing GitHub Actions Locally
+
+### Using Act
+1. Install Act:
+```bash
+curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
+```
+
+2. Setup test environment:
+```bash
+# Create test directory if not exists
+mkdir -p .act
+
+# Create env file with credentials
+echo "AWS_ACCESS_KEY_ID=test" > .act/.env
+echo "AWS_SECRET_ACCESS_KEY=test" >> .act/.env
+echo "AWS_DEFAULT_REGION=us-east-1" >> .act/.env
+
+# Create pull request event simulation
+cat > .act/pull_request.json << EOF
+{
+  "pull_request": {
+    "number": 1,
+    "body": "Test PR",
+    "head": {
+      "ref": "feature/test"
+    }
+  }
+}
+EOF
+```
+
+3. Run workflows locally:
+```bash
+# List available workflows
+act -l
+
+# Run workflow (using .actrc config)
+act -r pull_request -e .act/pull_request.json
+
+# Run specific workflow
+act -r -W .github/workflows/provisioning-ec2.yaml
+```
+
 
 ## Project Structure
 ```
