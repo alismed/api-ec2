@@ -16,6 +16,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install figlet
+        run: npm install -g figlet-cli
+
+      - name: Verify tfvars files
+        run: |
+          if [ ! -f infra/terraform.tfvars ]; then
+            figlet --horizontal-layout full "Error: Missing terraform.tfvars"
+            exit 1
+          fi
+          if [ ! -f destroy.yaml ]; then
+            figlet --horizontal-layout full "Error: Missing destroy.yaml"
+            exit 1
+          fi
+
       - name: Get Region from tfvars
         run: |
           export REGION=$(grep 'region' infra/terraform.tfvars | cut -d'"' -f2)
@@ -44,9 +63,12 @@ jobs:
 
       - name: Get Destroy infra from tfvars
         run: |
-          export DESTROY_INFRA=$(cat infra/terraform.tfvars | grep destroy_infra | cut -d'=' -f2 | tr -d '[:space:]')
+          export DESTROY_INFRA=$(cat destroy.yaml | grep destroy_infra | cut -d':' -f2 | tr -d '[:space:]')
           echo "Destroy Infra: $DESTROY_INFRA"
           echo "DESTROY_INFRA=$DESTROY_INFRA" >> $GITHUB_ENV
+          if [ "$DESTROY_INFRA" = "true" ]; then
+            figlet --horizontal-layout full "The infrastructure will be destroyed"
+          fi
 
       - name: Destroy infra if variable is set
         if: ${{ env.DESTROY_INFRA == 'true' }}
@@ -60,7 +82,7 @@ jobs:
         run: |
           cd infra
           terraform init
-          terraform apply -auto-approve
+          terraform apply -auto-approve || (figlet figlet --horizontal-layout full "Error: Terraform Apply Failed" && exit 1)
 
       - name: Set PR msg
         run: |
