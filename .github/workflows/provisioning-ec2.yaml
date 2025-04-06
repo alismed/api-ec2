@@ -4,7 +4,7 @@ on:
   pull_request:
     types: opened
     branches:
-      - 'feature/**'
+      - 'feature/*'
 
 jobs:
   deploy:
@@ -34,6 +34,17 @@ jobs:
             figlet --horizontal-layout full "Error: Missing destroy.yaml"
             exit 1
           fi
+
+      - name: Terraform Setup
+        run: |
+          if ! command -v terraform &> /dev/null; then
+            apt-get update
+            apt-get install -y unzip curl
+            curl -o terraform.zip https://releases.hashicorp.com/terraform/1.5.0/terraform_1.5.0_linux_amd64.zip
+            unzip terraform.zip
+            mv terraform /usr/local/bin/
+          fi
+          terraform version
 
       - name: Get Region from tfvars
         run: |
@@ -67,7 +78,7 @@ jobs:
           echo "Destroy Infra: $DESTROY_INFRA"
           echo "DESTROY_INFRA=$DESTROY_INFRA" >> $GITHUB_ENV
           if [ "$DESTROY_INFRA" = "true" ]; then
-            figlet --horizontal-layout full "The infrastructure will be destroyed"
+            figlet --horizontal-layout full "Infra will be destroyed"
           fi
 
       - name: Destroy infra if variable is set

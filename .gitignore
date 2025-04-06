@@ -45,3 +45,8 @@ terraform.rc
 
 # because using github actions
 *.hcl
+
+
+# Act testing files
+.act/.env
+.act/*.json
